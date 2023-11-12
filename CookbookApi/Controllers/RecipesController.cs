@@ -22,9 +22,16 @@ namespace CookbookApi.Controllers
         };
         
         [HttpGet]
-        public IEnumerable<Recipe> GetAllRecipes()
+        [ProducesResponseType(typeof(IEnumerable<Recipe>),StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public ActionResult<IEnumerable<Recipe>> GetAllRecipes()
         {
-            return _recipes;
+            if (_recipes.Count == 0)
+            {
+                return NotFound();
+            }
+            
+            return Ok(_recipes);
         }
     }
 }
