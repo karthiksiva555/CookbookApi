@@ -31,6 +31,7 @@ app.UseEndpoints(endpoints => {
 });
 if (app.Environment.IsDevelopment())
 {
+    app.UseDeveloperExceptionPage();
     app.UseSwagger();
     app.UseSwaggerUI(options =>
     {
@@ -38,4 +39,9 @@ if (app.Environment.IsDevelopment())
         options.SwaggerEndpoint("/swagger/v1/swagger.json", "Version 1");
     });
 }
+else
+{
+    app.UseExceptionHandler("/error");
+}
+
 app.Run();

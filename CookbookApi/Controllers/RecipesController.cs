@@ -1,41 +1,45 @@
+using System.Net.Mime;
 using CookbookApi.Models;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CookbookApi.Controllers
+namespace CookbookApi.Controllers;
+
+[Route("api/[controller]")]
+[ApiController]
+[Produces(MediaTypeNames.Application.Json)] // Produces responses only in JSON format
+[Consumes(MediaTypeNames.Application.Json)] // Accepts requests only in JSON format
+public class RecipesController : ControllerBase
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class RecipesController : ControllerBase
+    private readonly IList<Recipe> _recipes = new[]
     {
-        private readonly IList<Recipe> _recipes = new[]
+        new Recipe(1, "Tomato Dhal", new List<Ingredient>
         {
-            new Recipe(1, "Tomato Dhal", new List<Ingredient>
-            {
-                new(1, "Tomato", "Kilo Gram"),
-                new (2, "Lentils", "Cup")
-            }),
-            new Recipe(2, "Chicken Kurma", new List<Ingredient>
-            {
-                new(1, "Chicken", "Kilo Gram"),
-                new (2, "Yogurt", "Cup")
-            })
-        };
+            new(1, "Tomato", "Kilo Gram"),
+            new (2, "Lentils", "Cup")
+        }),
+        new Recipe(2, "Chicken Kurma", new List<Ingredient>
+        {
+            new(1, "Chicken", "Kilo Gram"),
+            new (2, "Yogurt", "Cup")
+        })
+    };
         
-        /// <summary>
-        /// Retrieves all the recipes available in the Cookbook
-        /// </summary>
-        /// <returns>List of recipes</returns>
-        [HttpGet]
-        [ProducesResponseType(typeof(IEnumerable<Recipe>),StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ActionResult<IEnumerable<Recipe>> GetAllRecipes()
-        {
-            if (_recipes.Count == 0)
-            {
-                return NotFound();
-            }
+    /// <summary>
+    /// Retrieves all the recipes available in the Cookbook
+    /// </summary>
+    /// <returns>List of recipes</returns>
+    [HttpGet]
+    [ProducesResponseType(typeof(IEnumerable<Recipe>),StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public ActionResult<IEnumerable<Recipe>> GetAllRecipes()
+    {
+        throw new Exception("This is a test exception");
             
-            return Ok(_recipes);
+        if (_recipes.Count == 0)
+        {
+            return NotFound();
         }
+            
+        return Ok(_recipes);
     }
 }
