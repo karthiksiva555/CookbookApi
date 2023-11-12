@@ -1,3 +1,4 @@
+using CookbookApi.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CookbookApi.Controllers
@@ -6,10 +7,22 @@ namespace CookbookApi.Controllers
     [ApiController]
     public class RecipesController : ControllerBase
     {
-        private readonly string[] _recipes = new[] { "Tomato Dhal", "Chicken Kurma", "Shrimp Teriyaki" };
+        private readonly IList<Recipe> _recipes = new[]
+        {
+            new Recipe(1, "Tomato Dhal", new List<Ingredient>
+            {
+                new(1, "Tomato", "Kilo Gram"),
+                new (2, "Lentils", "Cup")
+            }),
+            new Recipe(2, "Chicken Kurma", new List<Ingredient>
+            {
+                new(1, "Chicken", "Kilo Gram"),
+                new (2, "Yogurt", "Cup")
+            })
+        };
         
         [HttpGet]
-        public string[] GetAllRecipes()
+        public IEnumerable<Recipe> GetAllRecipes()
         {
             return _recipes;
         }
