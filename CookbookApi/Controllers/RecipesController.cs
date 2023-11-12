@@ -21,6 +21,10 @@ namespace CookbookApi.Controllers
             })
         };
         
+        /// <summary>
+        /// Retrieves all the recipes available in the Cookbook
+        /// </summary>
+        /// <returns>List of recipes</returns>
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<Recipe>),StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
