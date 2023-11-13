@@ -1,7 +1,9 @@
 using System.Net.Mime;
 using AutoMapper;
+using CookbookApi.Data;
 using CookbookApi.Dtos;
 using CookbookApi.Models;
+using CookbookApi.Utility;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CookbookApi.Controllers;
@@ -13,20 +15,6 @@ namespace CookbookApi.Controllers;
 public class RecipesController : ControllerBase
 {
     private readonly IMapper _mapper;
-
-    private readonly IList<Recipe> _recipes = new List<Recipe>
-    {
-        new(1, "Tomato Dhal", new List<Ingredient>
-        {
-            new(1, "Tomato", "Kilo Gram"),
-            new (2, "Lentils", "Cup")
-        }),
-        new(2, "Chicken Kurma", new List<Ingredient>
-        {
-            new(1, "Chicken", "Kilo Gram"),
-            new (2, "Yogurt", "Cup")
-        })
-    };
 
     public RecipesController(IMapper mapper)
     {
@@ -42,10 +30,8 @@ public class RecipesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public ActionResult<IEnumerable<RecipeDto>> GetAllRecipes()
     {
-        if (_recipes.Count == 0)
-            return NotFound();
-
-        var recipesDto = _mapper.Map<IEnumerable<RecipeDto>>(_recipes);
+        var recipes = RecipeListDatabase.GetRecipes();
+        var recipesDto = _mapper.Map<IEnumerable<RecipeDto>>(recipes);
         return Ok(recipesDto);
     }
 
@@ -59,14 +45,23 @@ public class RecipesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public ActionResult<RecipeDto> GetRecipeById([FromRoute] int id)
     {
-        var recipe = _recipes.FirstOrDefault(recipe => recipe.Id == id);
-        if (recipe is null)
-            return NotFound();
-
-        var recipeDto = _mapper.Map<RecipeDto>(recipe);
-        return Ok(recipeDto);
+        try
+        {
+            var recipe = RecipeListDatabase.GetRecipeById(id);
+            var recipeDto = _mapper.Map<RecipeDto>(recipe);
+            return Ok(recipeDto);
+        }
+        catch (HttpException exception)
+        {
+            return StatusCode(exception.StatusCode, exception.Message);
+        }
     }
 
+    /// <summary>
+    /// Creates a new recipe by taking RecipeDto as input from request body
+    /// </summary>
+    /// <param name="recipeDto">Details of the recipe to be created</param>
+    /// <returns>New recipe created</returns>
     [HttpPost]
     [ProducesResponseType(typeof(RecipeDto),StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -74,8 +69,32 @@ public class RecipesController : ControllerBase
     public IActionResult CreateRecipe([FromBody] RecipeDto recipeDto)
     {
         var recipe = _mapper.Map<Recipe>(recipeDto);
-        _recipes.Add(recipe);
-        
+        RecipeListDatabase.AddRecipe(recipe);
+
         return CreatedAtAction(nameof(GetRecipeById), new { id = recipe.Id }, recipeDto);
+    }
+
+    /// <summary>
+    /// Updates a recipe that matches id with a new recipe object passed as parameter. 
+    /// </summary>
+    /// <param name="id">Id of the recipe to be updated</param>
+    /// <param name="recipeDto">New recipe object that will replace existing recipe</param>
+    /// <returns>NoContent (204) after successful update</returns>
+    [HttpPut("{id:int}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public IActionResult UpdateRecipe([FromRoute] int id, [FromBody] RecipeDto recipeDto)
+    {
+        var updatedRecipe = _mapper.Map<Recipe>(recipeDto);
+        try
+        {
+            RecipeListDatabase.UpdateRecipe(id, updatedRecipe);
+        }
+        catch (HttpException exception)
+        {
+            return StatusCode(exception.StatusCode, exception.Message);
+        }
+        
+        return NoContent();
     }
 }
