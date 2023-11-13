@@ -25,10 +25,6 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 var app = builder.Build();
-app.UseRouting();
-app.UseEndpoints(endpoints => {
-    endpoints.MapControllers();
-});
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
@@ -41,7 +37,11 @@ if (app.Environment.IsDevelopment())
 }
 else
 {
-    app.UseExceptionHandler("/error");
+    app.UseExceptionHandler("/Error");
 }
+app.UseRouting();
+app.UseEndpoints(endpoints => {
+    endpoints.MapControllers();
+});
 
 app.Run();

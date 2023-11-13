@@ -1,20 +1,24 @@
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CookbookApi.Controllers;
-
-[ApiController]
-public class ErrorController : ControllerBase
+namespace CookbookApi.Controllers
 {
-    [HttpGet("/error")]
-    public IActionResult Error()
+    [Route("[controller]")]
+    [ApiController]
+    public class ErrorController : ControllerBase
     {
-        var context = HttpContext.Features.Get<IExceptionHandlerFeature>();
-        var stackTrace = context?.Error.StackTrace;
-        var errorMessage = context?.Error.Message;
+        [HttpGet]
+        public IActionResult Error()
+        {
+            var context = HttpContext.Features.Get<IExceptionHandlerFeature>();
+            var stackTrace = context?.Error.StackTrace;
+            var errorMessage = context?.Error.Message;
             
-        // Log these details for troubleshooting purposes
+            // Log these details for troubleshooting purposes
+            // ToDo: Add Logger
+            Console.WriteLine($"Error: {errorMessage}, Stack Trace: {stackTrace}");
             
-        return Problem();
+            return Problem();
+        }
     }
 }
