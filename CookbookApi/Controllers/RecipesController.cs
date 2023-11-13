@@ -33,13 +33,26 @@ public class RecipesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public ActionResult<IEnumerable<Recipe>> GetAllRecipes()
     {
-        throw new Exception("This is a test exception");
-            
         if (_recipes.Count == 0)
-        {
             return NotFound();
-        }
             
         return Ok(_recipes);
+    }
+
+    /// <summary>
+    /// Retrieves a specific recipe by taking recipe id as input
+    /// </summary>
+    /// <param name="id">Id of the recipe to search</param>
+    /// <returns>Matched recipe</returns>
+    [HttpGet("{id:int}")]
+    [ProducesResponseType(typeof(Recipe), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public ActionResult<Recipe> GetRecipeById([FromRoute] int id)
+    {
+        var recipe = _recipes.FirstOrDefault(recipe => recipe.Id == id);
+        if (recipe is null)
+            return NotFound();
+
+        return Ok(recipe);
     }
 }
