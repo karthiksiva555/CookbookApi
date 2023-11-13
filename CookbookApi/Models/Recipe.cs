@@ -1,3 +1,3 @@
 namespace CookbookApi.Models;
 
-public record Recipe(int Id, string Name, IList<Ingredient> Ingredients);
+public record Recipe(int Id, string Name, IEnumerable<Ingredient> Ingredients);

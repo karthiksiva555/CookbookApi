@@ -10,7 +10,9 @@ builder.Services.AddControllers();
 var mapperConfig = new MapperConfiguration(config =>
 {
     config.CreateMap<Recipe, RecipeDto>();
+    config.CreateMap<RecipeDto, Recipe>();
     config.CreateMap<Ingredient, IngredientDto>();
+    config.CreateMap<IngredientDto, Ingredient>();
 });
 IMapper mapper = new Mapper(mapperConfig);
 builder.Services.AddSingleton(mapper);

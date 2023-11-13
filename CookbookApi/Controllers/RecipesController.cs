@@ -14,14 +14,14 @@ public class RecipesController : ControllerBase
 {
     private readonly IMapper _mapper;
 
-    private readonly IList<Recipe> _recipes = new[]
+    private readonly IList<Recipe> _recipes = new List<Recipe>
     {
-        new Recipe(1, "Tomato Dhal", new List<Ingredient>
+        new(1, "Tomato Dhal", new List<Ingredient>
         {
             new(1, "Tomato", "Kilo Gram"),
             new (2, "Lentils", "Cup")
         }),
-        new Recipe(2, "Chicken Kurma", new List<Ingredient>
+        new(2, "Chicken Kurma", new List<Ingredient>
         {
             new(1, "Chicken", "Kilo Gram"),
             new (2, "Yogurt", "Cup")
@@ -65,5 +65,17 @@ public class RecipesController : ControllerBase
 
         var recipeDto = _mapper.Map<RecipeDto>(recipe);
         return Ok(recipeDto);
+    }
+
+    [HttpPost]
+    [ProducesResponseType(typeof(RecipeDto),StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public IActionResult CreateRecipe([FromBody] RecipeDto recipeDto)
+    {
+        var recipe = _mapper.Map<Recipe>(recipeDto);
+        _recipes.Add(recipe);
+        
+        return CreatedAtAction(nameof(GetRecipeById), new { id = recipe.Id }, recipeDto);
     }
 }
