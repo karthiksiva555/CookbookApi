@@ -1,4 +1,6 @@
 using System.Net.Mime;
+using AutoMapper;
+using CookbookApi.Dtos;
 using CookbookApi.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,6 +12,8 @@ namespace CookbookApi.Controllers;
 [Consumes(MediaTypeNames.Application.Json)] // Accepts requests only in JSON format
 public class RecipesController : ControllerBase
 {
+    private readonly IMapper _mapper;
+
     private readonly IList<Recipe> _recipes = new[]
     {
         new Recipe(1, "Tomato Dhal", new List<Ingredient>
@@ -23,20 +27,26 @@ public class RecipesController : ControllerBase
             new (2, "Yogurt", "Cup")
         })
     };
+
+    public RecipesController(IMapper mapper)
+    {
+        _mapper = mapper;
+    }
         
     /// <summary>
     /// Retrieves all the recipes available in the Cookbook
     /// </summary>
     /// <returns>List of recipes</returns>
     [HttpGet]
-    [ProducesResponseType(typeof(IEnumerable<Recipe>),StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IEnumerable<RecipeDto>),StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public ActionResult<IEnumerable<Recipe>> GetAllRecipes()
+    public ActionResult<IEnumerable<RecipeDto>> GetAllRecipes()
     {
         if (_recipes.Count == 0)
             return NotFound();
-            
-        return Ok(_recipes);
+
+        var recipesDto = _mapper.Map<IEnumerable<RecipeDto>>(_recipes);
+        return Ok(recipesDto);
     }
 
     /// <summary>
@@ -45,14 +55,15 @@ public class RecipesController : ControllerBase
     /// <param name="id">Id of the recipe to search</param>
     /// <returns>Matched recipe</returns>
     [HttpGet("{id:int}")]
-    [ProducesResponseType(typeof(Recipe), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(RecipeDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public ActionResult<Recipe> GetRecipeById([FromRoute] int id)
+    public ActionResult<RecipeDto> GetRecipeById([FromRoute] int id)
     {
         var recipe = _recipes.FirstOrDefault(recipe => recipe.Id == id);
         if (recipe is null)
             return NotFound();
 
-        return Ok(recipe);
+        var recipeDto = _mapper.Map<RecipeDto>(recipe);
+        return Ok(recipeDto);
     }
 }

@@ -1,8 +1,20 @@
 using System.Reflection;
+using AutoMapper;
 using Microsoft.OpenApi.Models;
+using CookbookApi.Dtos;
+using CookbookApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
+
+var mapperConfig = new MapperConfiguration(config =>
+{
+    config.CreateMap<Recipe, RecipeDto>();
+    config.CreateMap<Ingredient, IngredientDto>();
+});
+IMapper mapper = new Mapper(mapperConfig);
+builder.Services.AddSingleton(mapper);
+
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo()
