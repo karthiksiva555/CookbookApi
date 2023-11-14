@@ -23,11 +23,7 @@ public static class RecipeListDatabase
 
     public static Recipe GetRecipeById(int id)
     {
-        var recipe = _recipes.FirstOrDefault(recipe => recipe.Id == id);
-        if (recipe is null)
-            throw new HttpException(StatusCodes.Status404NotFound, $"Item with Id {id} not found");
-        
-        return recipe;
+        return GetRecipe(id);
     }
         
 
@@ -35,12 +31,25 @@ public static class RecipeListDatabase
 
     public static void UpdateRecipe(int id, Recipe updatedRecipe)
     {
-        var existingRecipe = _recipes.FirstOrDefault(recipe => recipe.Id == id);
-        if (existingRecipe == null)
-            throw new HttpException(StatusCodes.Status404NotFound, $"Item with Id {id} not found");
-        
+        var existingRecipe = GetRecipe(id);
         var index = _recipes.IndexOf(existingRecipe);
         _recipes[index] = updatedRecipe;
-    } 
+    }
+
+    public static void DeleteRecipe(int id)
+    {
+        var existingRecipe = GetRecipe(id);
+        _recipes.Remove(existingRecipe);
+    }
+
+    private static Recipe GetRecipe(int id)
+    {
+        var recipe = _recipes.FirstOrDefault(recipe => recipe.Id == id);
+        if (recipe is null)
+            throw new HttpException(StatusCodes.Status404NotFound, $"Item with Id {id} not found");
+        
+        return recipe;
+    }
+        
 
 }

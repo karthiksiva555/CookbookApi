@@ -28,6 +28,6 @@ public class RecipeRepository : IRepository<Recipe>
 
     public void Delete(int id)
     {
-        throw new NotImplementedException();
+        RecipeListDatabase.DeleteRecipe(id);
     }
 }

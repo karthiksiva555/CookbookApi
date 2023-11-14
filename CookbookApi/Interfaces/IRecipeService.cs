@@ -8,4 +8,5 @@ public interface IRecipeService
     Recipe GetRecipeById(int id);
     void AddRecipe(Recipe recipe);
     void UpdateRecipe(int id, Recipe updatedRecipe);
+    void DeleteRecipe(int id);
 }

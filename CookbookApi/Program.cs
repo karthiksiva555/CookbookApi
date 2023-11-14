@@ -8,7 +8,7 @@ using CookbookApi.Repositories;
 using CookbookApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddNewtonsoftJson();
 
 var mapperConfig = new MapperConfiguration(config =>
 {

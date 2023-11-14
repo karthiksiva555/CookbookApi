@@ -31,4 +31,9 @@ public class RecipeService : IRecipeService
     {
         _recipeRepository.Update(id, updatedRecipe);
     }
+
+    public void DeleteRecipe(int id)
+    {
+        _recipeRepository.Delete(id);
+    }
 }

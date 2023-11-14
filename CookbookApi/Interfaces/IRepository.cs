@@ -6,4 +6,5 @@ public interface IRepository<T>
     IList<T> GetAll();
     void Add(T entity);
     void Update(int id, T entity);
+    void Delete(int id);
 }
