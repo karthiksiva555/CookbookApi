@@ -1,7 +1,7 @@
 using System.Net.Mime;
 using AutoMapper;
-using CookbookApi.Data;
 using CookbookApi.Dtos;
+using CookbookApi.Interfaces;
 using CookbookApi.Models;
 using CookbookApi.Utility;
 using Microsoft.AspNetCore.Mvc;
@@ -15,10 +15,12 @@ namespace CookbookApi.Controllers;
 public class RecipesController : ControllerBase
 {
     private readonly IMapper _mapper;
+    private readonly IRecipeService _recipeService;
 
-    public RecipesController(IMapper mapper)
+    public RecipesController(IMapper mapper, IRecipeService recipeService)
     {
         _mapper = mapper;
+        _recipeService = recipeService;
     }
         
     /// <summary>
@@ -30,7 +32,7 @@ public class RecipesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public ActionResult<IEnumerable<RecipeDto>> GetAllRecipes()
     {
-        var recipes = RecipeListDatabase.GetRecipes();
+        var recipes = _recipeService.GetRecipes();
         var recipesDto = _mapper.Map<IEnumerable<RecipeDto>>(recipes);
         return Ok(recipesDto);
     }
@@ -47,7 +49,7 @@ public class RecipesController : ControllerBase
     {
         try
         {
-            var recipe = RecipeListDatabase.GetRecipeById(id);
+            var recipe = _recipeService.GetRecipeById(id);
             var recipeDto = _mapper.Map<RecipeDto>(recipe);
             return Ok(recipeDto);
         }
@@ -69,7 +71,7 @@ public class RecipesController : ControllerBase
     public IActionResult CreateRecipe([FromBody] RecipeDto recipeDto)
     {
         var recipe = _mapper.Map<Recipe>(recipeDto);
-        RecipeListDatabase.AddRecipe(recipe);
+        _recipeService.AddRecipe(recipe);
 
         return CreatedAtAction(nameof(GetRecipeById), new { id = recipe.Id }, recipeDto);
     }
@@ -88,7 +90,7 @@ public class RecipesController : ControllerBase
         var updatedRecipe = _mapper.Map<Recipe>(recipeDto);
         try
         {
-            RecipeListDatabase.UpdateRecipe(id, updatedRecipe);
+            _recipeService.UpdateRecipe(id, updatedRecipe);
         }
         catch (HttpException exception)
         {

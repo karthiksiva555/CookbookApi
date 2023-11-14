@@ -2,7 +2,10 @@ using System.Reflection;
 using AutoMapper;
 using Microsoft.OpenApi.Models;
 using CookbookApi.Dtos;
+using CookbookApi.Interfaces;
 using CookbookApi.Models;
+using CookbookApi.Repositories;
+using CookbookApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
@@ -16,6 +19,11 @@ var mapperConfig = new MapperConfiguration(config =>
 });
 IMapper mapper = new Mapper(mapperConfig);
 builder.Services.AddSingleton(mapper);
+
+// Added as singleton so that recipe list is shared between http requests.
+// ToDo: Change to Transient/Scoped once static list is replaced by a proper database
+builder.Services.AddSingleton<IRepository<Recipe>, RecipeRepository>();
+builder.Services.AddSingleton<IRecipeService, RecipeService>();
 
 builder.Services.AddSwaggerGen(options =>
 {
