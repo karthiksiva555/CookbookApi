@@ -1,8 +1,6 @@
 using System.Net.Mime;
-using AutoMapper;
 using CookbookApi.Dtos;
 using CookbookApi.Interfaces;
-using CookbookApi.Models;
 using CookbookApi.Utility;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
@@ -15,12 +13,10 @@ namespace CookbookApi.Controllers;
 [Consumes(MediaTypeNames.Application.Json)] // Accepts requests only in JSON format
 public class RecipesController : ControllerBase
 {
-    private readonly IMapper _mapper;
     private readonly IRecipeService _recipeService;
 
-    public RecipesController(IMapper mapper, IRecipeService recipeService)
+    public RecipesController(IRecipeService recipeService)
     {
-        _mapper = mapper;
         _recipeService = recipeService;
     }
         
@@ -34,8 +30,7 @@ public class RecipesController : ControllerBase
     public ActionResult<IEnumerable<RecipeDto>> GetAllRecipes()
     {
         var recipes = _recipeService.GetRecipes();
-        var recipesDto = _mapper.Map<IEnumerable<RecipeDto>>(recipes);
-        return Ok(recipesDto);
+        return Ok(recipes);
     }
 
     /// <summary>
@@ -51,8 +46,7 @@ public class RecipesController : ControllerBase
         try
         {
             var recipe = _recipeService.GetRecipeById(id);
-            var recipeDto = _mapper.Map<RecipeDto>(recipe);
-            return Ok(recipeDto);
+            return Ok(recipe);
         }
         catch (HttpException exception)
         {
@@ -63,32 +57,30 @@ public class RecipesController : ControllerBase
     /// <summary>
     /// Creates a new recipe by taking RecipeDto as input from request body
     /// </summary>
-    /// <param name="recipeDto">Details of the recipe to be created</param>
+    /// <param name="recipe">Details of the recipe to be created</param>
     /// <returns>New recipe created</returns>
     [HttpPost]
     [ProducesResponseType(typeof(RecipeDto),StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public IActionResult CreateRecipe([FromBody] RecipeDto recipeDto)
+    public IActionResult CreateRecipe([FromBody] RecipeDto recipe)
     {
-        var recipe = _mapper.Map<Recipe>(recipeDto);
         _recipeService.AddRecipe(recipe);
 
-        return CreatedAtAction(nameof(GetRecipeById), new { id = recipe.Id }, recipeDto);
+        return CreatedAtAction(nameof(GetRecipeById), new { id = recipe.Id }, recipe);
     }
 
     /// <summary>
     /// Updates a recipe that matches id with a new recipe object passed as parameter. 
     /// </summary>
     /// <param name="id">Id of the recipe to be updated</param>
-    /// <param name="recipeDto">New recipe object that will replace existing recipe</param>
+    /// <param name="updatedRecipe">New recipe object that will replace existing recipe</param>
     /// <returns>NoContent (204) after successful update</returns>
     [HttpPut("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public IActionResult UpdateRecipe([FromRoute] int id, [FromBody] RecipeDto recipeDto)
+    public IActionResult UpdateRecipe([FromRoute] int id, [FromBody] RecipeDto updatedRecipe)
     {
-        var updatedRecipe = _mapper.Map<Recipe>(recipeDto);
         try
         {
             _recipeService.UpdateRecipe(id, updatedRecipe);
@@ -115,12 +107,10 @@ public class RecipesController : ControllerBase
     {
         try
         {
-            var existingRecipe = _recipeService.GetRecipeById(id);
-            var recipeDto = _mapper.Map<RecipeDto>(existingRecipe);
-            recipeUpdates.ApplyTo(recipeDto);
+            var recipe = _recipeService.GetRecipeById(id);
+            recipeUpdates.ApplyTo(recipe);
 
-            var updatedRecipe = _mapper.Map<Recipe>(recipeDto);
-            _recipeService.UpdateRecipe(id, updatedRecipe);
+            _recipeService.UpdateRecipe(id, recipe);
             
             return NoContent();
         }

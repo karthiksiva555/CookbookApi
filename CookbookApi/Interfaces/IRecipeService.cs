@@ -1,12 +1,12 @@
-using CookbookApi.Models;
+using CookbookApi.Dtos;
 
 namespace CookbookApi.Interfaces;
 
 public interface IRecipeService
 {
-    IList<Recipe> GetRecipes();
-    Recipe GetRecipeById(int id);
-    void AddRecipe(Recipe recipe);
-    void UpdateRecipe(int id, Recipe updatedRecipe);
+    IList<RecipeDto> GetRecipes();
+    RecipeDto GetRecipeById(int id);
+    void AddRecipe(RecipeDto recipe);
+    void UpdateRecipe(int id, RecipeDto updatedRecipe);
     void DeleteRecipe(int id);
 }

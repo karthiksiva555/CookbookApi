@@ -1,3 +1,5 @@
+using AutoMapper;
+using CookbookApi.Dtos;
 using CookbookApi.Interfaces;
 using CookbookApi.Models;
 
@@ -6,29 +8,35 @@ namespace CookbookApi.Services;
 public class RecipeService : IRecipeService
 {
     private readonly IRepository<Recipe> _recipeRepository;
+    private readonly IMapper _mapper;
 
-    public RecipeService(IRepository<Recipe> recipeRepository)
+    public RecipeService(IRepository<Recipe> recipeRepository, IMapper mapper)
     {
         _recipeRepository = recipeRepository;
+        _mapper = mapper;
     }
 
-    public IList<Recipe> GetRecipes()
+    public IList<RecipeDto> GetRecipes()
     {
-        return _recipeRepository.GetAll();
+        var recipes = _recipeRepository.GetAll(); 
+        return _mapper.Map<IList<RecipeDto>>(recipes);;
     }
 
-    public Recipe GetRecipeById(int id)
+    public RecipeDto GetRecipeById(int id)
     {
-        return _recipeRepository.GetById(id);
+        var recipe = _recipeRepository.GetById(id); 
+        return _mapper.Map<RecipeDto>(recipe);
     }
 
-    public void AddRecipe(Recipe recipe)
+    public void AddRecipe(RecipeDto recipeDto)
     {
+        var recipe = _mapper.Map<Recipe>(recipeDto);
         _recipeRepository.Add(recipe);
     }
 
-    public void UpdateRecipe(int id, Recipe updatedRecipe)
+    public void UpdateRecipe(int id, RecipeDto updatedRecipeDto)
     {
+        var updatedRecipe = _mapper.Map<Recipe>(updatedRecipeDto);
         _recipeRepository.Update(id, updatedRecipe);
     }
 
