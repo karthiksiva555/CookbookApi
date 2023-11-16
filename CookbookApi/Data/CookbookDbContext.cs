@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CookbookApi.Data;
 
-public class CookbookDbContext : DbContext
+public sealed class CookbookDbContext : DbContext
 {
     public DbSet<Recipe> Recipes { get; set; }
     

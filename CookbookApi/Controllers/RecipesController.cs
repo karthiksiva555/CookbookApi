@@ -29,8 +29,15 @@ public class RecipesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<IEnumerable<RecipeDto>>> GetAllRecipesAsync()
     {
-        var recipes = await _recipeService.GetRecipesAsync();
-        return Ok(recipes);
+        try
+        {
+            var recipes = await _recipeService.GetRecipesAsync();
+            return Ok(recipes);
+        }
+        catch (HttpException exception)
+        {
+            return StatusCode(exception.StatusCode, exception.Message);
+        }
     }
 
     /// <summary>
