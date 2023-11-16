@@ -2,9 +2,13 @@ namespace CookbookApi.Interfaces;
 
 public interface IRepository<T>
 {
-    T GetById(int id);
-    IList<T> GetAll();
-    void Add(T entity);
-    void Update(int id, T entity);
-    void Delete(int id);
+    Task<IList<T>> GetAllAsync();
+
+    Task<T> GetByIdAsync(int id);
+
+    Task AddAsync(T entity);
+
+    Task UpdateAsync(int id, T updatedRecipe);
+
+    Task DeleteAsync(int id);
 }

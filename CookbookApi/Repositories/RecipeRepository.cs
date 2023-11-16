@@ -1,33 +1,80 @@
 using CookbookApi.Data;
 using CookbookApi.Interfaces;
 using CookbookApi.Models;
+using CookbookApi.Utility;
+using Microsoft.EntityFrameworkCore;
 
 namespace CookbookApi.Repositories;
 
 public class RecipeRepository : IRepository<Recipe>
 {
-    public Recipe GetById(int id)
+    private readonly CookbookDbContext _dbContext;
+
+    public RecipeRepository(CookbookDbContext dbContext)
     {
-        return RecipeListDatabase.GetRecipeById(id);
+        _dbContext = dbContext;
+    }
+    
+    public async Task<IList<Recipe>> GetAllAsync()
+    {
+        return await _dbContext.Recipes.ToListAsync();
     }
 
-    public IList<Recipe> GetAll()
+    public async Task<Recipe> GetByIdAsync(int id)
     {
-        return RecipeListDatabase.GetRecipes();
+        if (!_dbContext.Recipes.Any())
+        {
+            throw new HttpException(StatusCodes.Status404NotFound, $"Recipe list is empty.");
+        }
+        
+        var recipe = await _dbContext.Recipes.FindAsync(id);
+        
+        if (recipe is null)
+            throw new HttpException(StatusCodes.Status404NotFound, $"Item with Id {id} not found.");
+        
+        return recipe;
     }
 
-    public void Add(Recipe recipe)
+    public async Task AddAsync(Recipe recipe)
     {
-        RecipeListDatabase.AddRecipe(recipe);
+        await _dbContext.AddAsync(recipe);
+        await _dbContext.SaveChangesAsync();
     }
 
-    public void Update(int id, Recipe recipe)
+    public async Task UpdateAsync(int id, Recipe updatedRecipe)
     {
-        RecipeListDatabase.UpdateRecipe(id, recipe);
+        var existingRecipe = await GetByIdAsync(id);
+
+        if (existingRecipe.Id != updatedRecipe.Id)
+        {
+            throw new HttpException(StatusCodes.Status400BadRequest, $"Id does not match with the recipe supplied.");
+        }
+
+        _dbContext.Entry(updatedRecipe).State = EntityState.Modified;
+
+        try
+        {
+            await _dbContext.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!RecipeExists(id))
+            {
+                throw new HttpException(StatusCodes.Status404NotFound, $"Item with Id {id} not found.");
+            }
+
+            throw;
+        }
     }
 
-    public void Delete(int id)
+    public async Task DeleteAsync(int id)
     {
-        RecipeListDatabase.DeleteRecipe(id);
+        var recipe = await GetByIdAsync(id);
+
+        _dbContext.Remove(recipe);
+        await _dbContext.SaveChangesAsync();
     }
+
+    private bool RecipeExists(int id) => _dbContext.Recipes.Any(e => e.Id == id);
+   
 }

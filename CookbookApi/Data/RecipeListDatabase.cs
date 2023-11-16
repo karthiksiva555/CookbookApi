@@ -3,46 +3,45 @@ using CookbookApi.Utility;
 
 namespace CookbookApi.Data;
 
-public static class RecipeListDatabase
+public class RecipeListDatabase
 {
-    private static IList<Recipe> _recipes = new List<Recipe>
+    private readonly IList<Recipe> _recipes = new List<Recipe>
     {
-        new(1, "Tomato Dhal", new List<Ingredient>
+        new() {Id = 1, Name = "Tomato Dhal", Ingredients = new List<Ingredient>
         {
-            new(1, "Tomato", "Kilo Gram"),
-            new (2, "Lentils", "Cup")
-        }),
-        new(2, "Chicken Kurma", new List<Ingredient>
+            new() { Id = 1, Name = "Tomato", Unit = "Kilo Gram" },
+            new() { Id = 2, Name = "Lentils", Unit = "Cup" }
+        }},
+        new() {Id = 2, Name = "Chicken Kurma", Ingredients = new List<Ingredient>
         {
-            new(1, "Chicken", "Kilo Gram"),
-            new (2, "Yogurt", "Cup")
-        })
+            new() { Id = 3, Name = "Chicken", Unit = "Kilo Gram" },
+            new() { Id = 4, Name = "Yogurt", Unit = "Cup" }
+        }}
     };
 
-    public static IList<Recipe> GetRecipes() => _recipes;
+    public IList<Recipe> GetRecipes() => _recipes;
 
-    public static Recipe GetRecipeById(int id)
+    public Recipe GetRecipeById(int id)
     {
         return GetRecipe(id);
     }
-        
 
-    public static void AddRecipe(Recipe recipe) => _recipes.Add(recipe);
+    public void AddRecipe(Recipe recipe) => _recipes.Add(recipe);
 
-    public static void UpdateRecipe(int id, Recipe updatedRecipe)
+    public void UpdateRecipe(int id, Recipe updatedRecipe)
     {
         var existingRecipe = GetRecipe(id);
         var index = _recipes.IndexOf(existingRecipe);
         _recipes[index] = updatedRecipe;
     }
 
-    public static void DeleteRecipe(int id)
+    public void DeleteRecipe(int id)
     {
         var existingRecipe = GetRecipe(id);
         _recipes.Remove(existingRecipe);
     }
 
-    private static Recipe GetRecipe(int id)
+    private Recipe GetRecipe(int id)
     {
         var recipe = _recipes.FirstOrDefault(recipe => recipe.Id == id);
         if (recipe is null)

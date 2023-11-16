@@ -15,33 +15,37 @@ public class RecipeService : IRecipeService
         _recipeRepository = recipeRepository;
         _mapper = mapper;
     }
-
-    public IList<RecipeDto> GetRecipes()
+    
+    public async Task<IList<RecipeDto>> GetRecipesAsync()
     {
-        var recipes = _recipeRepository.GetAll(); 
-        return _mapper.Map<IList<RecipeDto>>(recipes);;
+        var recipes = await _recipeRepository.GetAllAsync();
+        var recipesDto = _mapper.Map<IList<RecipeDto>>(recipes);
+
+        return recipesDto;
     }
 
-    public RecipeDto GetRecipeById(int id)
+    public async Task<RecipeDto> GetRecipeByIdAsync(int id)
     {
-        var recipe = _recipeRepository.GetById(id); 
-        return _mapper.Map<RecipeDto>(recipe);
+        var recipe = await _recipeRepository.GetByIdAsync(id);
+        var recipeDto = _mapper.Map<RecipeDto>(recipe);
+
+        return recipeDto;
     }
 
-    public void AddRecipe(RecipeDto recipeDto)
+    public async Task AddRecipeAsync(RecipeDto recipeDto)
     {
         var recipe = _mapper.Map<Recipe>(recipeDto);
-        _recipeRepository.Add(recipe);
+        await _recipeRepository.AddAsync(recipe);
     }
 
-    public void UpdateRecipe(int id, RecipeDto updatedRecipeDto)
+    public async Task UpdateRecipeAsync(int id, RecipeDto recipeDto)
     {
-        var updatedRecipe = _mapper.Map<Recipe>(updatedRecipeDto);
-        _recipeRepository.Update(id, updatedRecipe);
+        var recipe = _mapper.Map<Recipe>(recipeDto);
+        await _recipeRepository.UpdateAsync(id, recipe);
     }
 
-    public void DeleteRecipe(int id)
+    public async Task DeleteRecipeAsync(int id)
     {
-        _recipeRepository.Delete(id);
+        await _recipeRepository.DeleteAsync(id);
     }
 }

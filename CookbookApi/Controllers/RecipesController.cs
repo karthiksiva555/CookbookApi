@@ -27,9 +27,9 @@ public class RecipesController : ControllerBase
     [HttpGet]
     [ProducesResponseType(typeof(IEnumerable<RecipeDto>),StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public ActionResult<IEnumerable<RecipeDto>> GetAllRecipes()
+    public async Task<ActionResult<IEnumerable<RecipeDto>>> GetAllRecipesAsync()
     {
-        var recipes = _recipeService.GetRecipes();
+        var recipes = await _recipeService.GetRecipesAsync();
         return Ok(recipes);
     }
 
@@ -39,13 +39,14 @@ public class RecipesController : ControllerBase
     /// <param name="id">Id of the recipe to search</param>
     /// <returns>Matched recipe</returns>
     [HttpGet("{id:int}")]
+    [ActionName(nameof(GetRecipeByIdAsync))]
     [ProducesResponseType(typeof(RecipeDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public ActionResult<RecipeDto> GetRecipeById([FromRoute] int id)
+    public async Task<IActionResult> GetRecipeByIdAsync([FromRoute] int id)
     {
         try
         {
-            var recipe = _recipeService.GetRecipeById(id);
+            var recipe = await _recipeService.GetRecipeByIdAsync(id);
             return Ok(recipe);
         }
         catch (HttpException exception)
@@ -63,11 +64,11 @@ public class RecipesController : ControllerBase
     [ProducesResponseType(typeof(RecipeDto),StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public IActionResult CreateRecipe([FromBody] RecipeDto recipe)
+    public async Task<IActionResult> CreateRecipeAsync([FromBody] RecipeDto recipe)
     {
-        _recipeService.AddRecipe(recipe);
+        await _recipeService.AddRecipeAsync(recipe);
 
-        return CreatedAtAction(nameof(GetRecipeById), new { id = recipe.Id }, recipe);
+        return CreatedAtAction(nameof(GetRecipeByIdAsync), new { id = recipe.Id }, recipe);
     }
 
     /// <summary>
@@ -79,11 +80,11 @@ public class RecipesController : ControllerBase
     [HttpPut("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public IActionResult UpdateRecipe([FromRoute] int id, [FromBody] RecipeDto updatedRecipe)
+    public async Task<IActionResult> UpdateRecipeAsync([FromRoute] int id, [FromBody] RecipeDto updatedRecipe)
     {
         try
         {
-            _recipeService.UpdateRecipe(id, updatedRecipe);
+            await _recipeService.UpdateRecipeAsync(id, updatedRecipe);
         }
         catch (HttpException exception)
         {
@@ -103,14 +104,14 @@ public class RecipesController : ControllerBase
     [HttpPatch("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public IActionResult PatchRecipe(int id, [FromBody]JsonPatchDocument<RecipeDto> recipeUpdates)
+    public async Task<IActionResult> PatchRecipeAsync(int id, [FromBody]JsonPatchDocument<RecipeDto> recipeUpdates)
     {
         try
         {
-            var recipe = _recipeService.GetRecipeById(id);
+            var recipe = await _recipeService.GetRecipeByIdAsync(id);
             recipeUpdates.ApplyTo(recipe);
 
-            _recipeService.UpdateRecipe(id, recipe);
+            await _recipeService.UpdateRecipeAsync(id, recipe);
             
             return NoContent();
         }
@@ -128,11 +129,11 @@ public class RecipesController : ControllerBase
     [HttpDelete("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public IActionResult DeleteRecipe(int id)
+    public async Task<IActionResult> DeleteRecipeAsync(int id)
     {
         try
         {
-            _recipeService.DeleteRecipe(id);
+            await _recipeService.DeleteRecipeAsync(id);
         }
         catch (HttpException exception)
         {

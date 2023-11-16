@@ -4,9 +4,13 @@ namespace CookbookApi.Interfaces;
 
 public interface IRecipeService
 {
-    IList<RecipeDto> GetRecipes();
-    RecipeDto GetRecipeById(int id);
-    void AddRecipe(RecipeDto recipe);
-    void UpdateRecipe(int id, RecipeDto updatedRecipe);
-    void DeleteRecipe(int id);
+    Task<IList<RecipeDto>> GetRecipesAsync();
+
+    Task<RecipeDto> GetRecipeByIdAsync(int id);
+
+    Task AddRecipeAsync(RecipeDto recipeDto);
+
+    Task UpdateRecipeAsync(int id, RecipeDto recipeDto);
+
+    Task DeleteRecipeAsync(int id);
 }
